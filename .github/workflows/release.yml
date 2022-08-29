@@ -46,7 +46,8 @@ jobs:
       - id: get-version
         run: echo "::set-output name=version::$(cat $VERSION_FILE)"
 
-      - run: printf "${{ steps.parse-changelog.outputs.latestSection }}" > temp-release-notes.md
+      - name: Unescape special characters
+        run: printf "${{ steps.parse-changelog.outputs.latestSection }}" > unescaped-release-notes.md
 
       - name: Create Release
         id: create_release
@@ -56,5 +57,4 @@ jobs:
         with:
           tag_name: ${{ github.ref }}
           release_name: v${{ steps.get-version.outputs.version }}
-          body: ${{ steps.parse-changelog.outputs.latestSection }}
-          # body_path: temp-release-notes.md
+          body_path: unescaped-release-notes.md
