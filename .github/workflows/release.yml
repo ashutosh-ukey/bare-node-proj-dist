@@ -16,8 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: CHANGELOG_FILE=versioning/CHANGELOG.md
-      - id: parse_changelog
-        run: |
+      - run: |
           i=0
           header_start=-1
           release_message=""
@@ -37,9 +36,12 @@ jobs:
                   release_message="$release_message\n$p"
               fi
               ((i=i+1))
-          done < $CHANGELOG_FILE
+          done < ${CHANGELOG_FILE}
 
-          echo "::set-output name=latestSection::$release_message"
+          echo "$release_message"
+
+      - id: parse_changelog
+        run: echo "::set-output name=latestSection::$release_message"
 
   git-release:
     name: Create Release
@@ -51,9 +53,9 @@ jobs:
       - run: VERSION_FILE=versioning/VERSION
 
       - name: Extract version 
-        run: VERSION="$(cat $VERSION_FILE)"
+        run: VERSION="$(cat "$VERSION_FILE")"
 
-      - run: echo "$VERSION"
+      - run: echo "$(cat versioning/VERSION)"
       - run: echo "${{ needs.get-release-body.outputs.releaseBody }}"
 
       - name: Create Release
