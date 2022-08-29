@@ -55,6 +55,7 @@ jobs:
 
       - run: echo "$(cat versioning/VERSION)"
       - run: echo "${{ needs.get-release-body.outputs.releaseBody }}"
+      - run: echo "${{ needs.get-release-body.outputs.releaseBody }}" > temp-notes.md
 
       - name: Create Release
         id: create_release
@@ -64,4 +65,4 @@ jobs:
         with:
           tag_name: ${{ github.ref }}
           release_name: v${{ env.VERSION }}
-          body: ${{ needs.get-release-body.outputs.releaseBody }}
+          body_path: temp-notes.md
