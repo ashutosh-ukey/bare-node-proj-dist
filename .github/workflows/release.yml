@@ -36,7 +36,7 @@ jobs:
                   release_message="$release_message\n$p"
               fi
               ((i=i+1))
-          done < $CHANGELOG_FILE
+          done < ${CHANGELOG_FILE}
 
           echo "::set-output name=latestSection::$release_message"
 
