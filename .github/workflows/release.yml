@@ -42,7 +42,7 @@ jobs:
 
   git-release:
     name: Create Release
-    needs: [get-version, get-release-body]
+    needs: get-release-body
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
