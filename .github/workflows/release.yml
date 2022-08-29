@@ -55,7 +55,7 @@ jobs:
 
       - run: echo "$(cat versioning/VERSION)"
       - run: echo "${{ needs.get-release-body.outputs.releaseBody }}"
-      - run: echo "${{ needs.get-release-body.outputs.releaseBody }}" > temp-notes.md
+      - run: printf "${{ needs.get-release-body.outputs.releaseBody }}" > temp-notes.md
 
       - name: Create Release
         id: create_release
