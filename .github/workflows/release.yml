@@ -50,10 +50,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - run: VERSION_FILE=versioning/VERSION
+      # - run: VERSION_FILE=versioning/VERSION
 
-      - name: Extract version 
-        run: VERSION="$(cat "$VERSION_FILE")"
+      # - name: Extract version 
+      #   run: VERSION="$(cat "$VERSION_FILE")"
 
       - run: echo "$(cat versioning/VERSION)"
       - run: echo "${{ needs.get-release-body.outputs.releaseBody }}"
@@ -65,5 +65,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref }}
-          release_name: v${{ env.VERSION }}
+          release_name: v0.1.0
           body: ${{ needs.get-release-body.outputs.releaseBody }}
