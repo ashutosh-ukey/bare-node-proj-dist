@@ -6,16 +6,18 @@ on:
   #   tags:
   #     - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 
+env:
+  CHANGELOG_FILE: versioning/CHANGELOG.md
+  VERSION_FILE: versioning/VERSION
+
 name: Create Release
 
 jobs:
-  get-release-body:
+  get-release:
     runs-on: ubuntu-latest
-    outputs:
-      releaseBody: ${{ steps.parse_changelog.outputs.latestSection }}
     steps:
       - uses: actions/checkout@v3
-      - id: parse_changelog
+      - id: parse-changelog
         run: |
           i=0
           header_start=-1
@@ -36,24 +38,15 @@ jobs:
                   release_message="$release_message\n$p"
               fi
               ((i=i+1))
-          done < versioning/CHANGELOG.md
+          done < $CHANGELOG_FILE
 
           echo "::set-output name=latestSection::$release_message"
           echo "$release_message"
+      
+      - id: get-version
+        run: echo "::set-output name=version::$(cat $VERSION_FILE)"
 
-  git-release:
-    name: Create Release
-    needs: get-release-body
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Extract version 
-        run: export VERSION="$(cat versioning/VERSION)"
-
-      - run: echo "$VERSION"
-      - run: echo "${{ needs.get-release-body.outputs.releaseBody }}"
-      - run: printf "${{ needs.get-release-body.outputs.releaseBody }}" > temp-release-notes.md
+      - run: printf "${{ steps.parse-changelog.outputs.latestSection }}" > temp-release-notes.md
 
       - name: Create Release
         id: create_release
@@ -62,5 +55,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref }}
-          release_name: v${{ env.VERSION }}
+          release_name: v${{ steps.get-version.outputs.version }}
           body_path: temp-release-notes.md
