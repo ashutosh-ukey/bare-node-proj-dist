@@ -1,0 +1,63 @@
+on:
+  workflow_dispatch:
+  # push:
+  #   # Sequence of patterns matched against refs/tags
+  #   tags:
+  #     - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+
+name: Create Release
+
+jobs:
+  get-release-body:
+    runs-on: ubuntu-latest
+    outputs:
+      releaseBody: ${{ steps.parse_changelog.outputs.latestSection }}
+    steps:
+      - run: CHANGELOG_FILE=versioning/CHANGELOG.md
+      - id: parse_changelog
+        run: |
+          i=0
+          header_start=-1
+          release_message=""
+
+          while read p; do
+              if [[ $p == \#\#\ * ]]
+              then
+                  if [[ $header_start -gt -1 ]]
+                  then
+                      break
+                  fi
+                  header_start=$i
+              fi
+
+              if [[ $header_start -gt -1 ]]
+              then
+                  release_message="$release_message\n$p"
+              fi
+              ((i=i+1))
+          done < $CHANGELOG_FILE
+
+          echo "::set-output name=latestSection::$release_message"
+
+  git-release:
+    name: Create Release
+    needs: [get-version, get-release-body]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - run: VERSION_FILE=versioning/VERSION
+
+      - name: Extract version 
+        run: VERSION="$(cat $VERSION_FILE)"
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: v${{ env.VERSION }}
+          body: ${{ needs.get-release-body.outputs.releaseBody }}
