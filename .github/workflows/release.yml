@@ -56,4 +56,5 @@ jobs:
         with:
           tag_name: ${{ github.ref }}
           release_name: v${{ steps.get-version.outputs.version }}
-          body_path: temp-release-notes.md
+          body: ${{ steps.parse-changelog.outputs.latestSection }}
+          # body_path: temp-release-notes.md
