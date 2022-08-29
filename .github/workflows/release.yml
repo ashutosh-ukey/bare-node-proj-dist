@@ -48,14 +48,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - run: export VERSION_FILE=versioning/VERSION
-
       - name: Extract version 
-        run: export VERSION="$(cat $VERSION_FILE)"
+        run: export VERSION="$(cat versioning/VERSION)"
 
-      - run: echo "$(cat versioning/VERSION)"
+      - run: echo "$VERSION"
       - run: echo "${{ needs.get-release-body.outputs.releaseBody }}"
-      - run: printf "${{ needs.get-release-body.outputs.releaseBody }}" > temp-notes.md
+      - run: printf "${{ needs.get-release-body.outputs.releaseBody }}" > temp-release-notes.md
 
       - name: Create Release
         id: create_release
@@ -65,4 +63,4 @@ jobs:
         with:
           tag_name: ${{ github.ref }}
           release_name: v${{ env.VERSION }}
-          body_path: temp-notes.md
+          body_path: temp-release-notes.md
