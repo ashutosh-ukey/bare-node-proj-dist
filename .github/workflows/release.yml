@@ -15,7 +15,8 @@ jobs:
       releaseBody: ${{ steps.parse_changelog.outputs.latestSection }}
     steps:
       - uses: actions/checkout@v3
-      - run: |
+      - id: parse_changelog
+        run: |
           i=0
           header_start=-1
           release_message=""
@@ -37,10 +38,8 @@ jobs:
               ((i=i+1))
           done < versioning/CHANGELOG.md
 
+          echo "::set-output name=latestSection::$release_message"
           echo "$release_message"
-
-      - id: parse_changelog
-        run: echo "::set-output name=latestSection::$release_message"
 
   git-release:
     name: Create Release
