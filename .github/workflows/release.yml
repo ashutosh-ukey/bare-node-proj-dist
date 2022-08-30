@@ -1,19 +1,17 @@
 on:
   workflow_dispatch:
   push:
-  # push:
-  #   # Sequence of patterns matched against refs/tags
-  #   tags:
-  #     - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+    paths:
+      - 'VERSION'
 
 env:
-  CHANGELOG_FILE: versioning/CHANGELOG.md
-  VERSION_FILE: versioning/VERSION
+  CHANGELOG_FILE: CHANGELOG.md
+  VERSION_FILE: VERSION
 
 name: Create Release
 
 jobs:
-  get-release:
+  create-git-release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
